@@ -4,7 +4,7 @@
   "description": "BuffetRating - Universal Buffet Menu Rating System",
   "main": "src/index.html",
   "scripts": {
-    "build": "if not exist dist mkdir dist && if exist src\\* copy src\\* dist\\",
+    "build": "shx mkdir -p dist && shx cp -r src/* dist/",
     "serve": "npx http-server dist -p 8080 -o",
     "dev": "npm run build && npm run serve"
   },
@@ -12,6 +12,7 @@
     "aws-amplify": "^6.0.0"
   },
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "shx": "^0.4.0"
   }
 }
