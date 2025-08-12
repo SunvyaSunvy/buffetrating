@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuffetRating - Rate Your Buffet Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .auth-section {
+            margin-top: 1rem;
+        }
+
+        .login-form {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #emailInput {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 25px;
+            min-width: 250px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .login-btn, .logout-btn {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid white;
+            border-radius: 25px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover, .logout-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .user-info {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #userEmail {
+            font-weight: 500;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .read-only-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            max-width: 100%;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sort-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .sort-button {
+            padding: 0.75rem 1rem;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 140px;
+            justify-content: space-between;
+        }
+
+        .sort-button:hover {
+            background: #f8f9ff;
+        }
+
+        .sort-options {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 180px;
+            display: none;
+        }
+
+        .sort-options.show {
+            display: block;
+        }
+
+        .sort-option {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.2s;
+        }
+
+        .sort-option:last-child {
+            border-bottom: none;
+        }
+
+        .sort-option:hover {
+            background: #f8f9ff;
+        }
+
+        .sort-option.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .dish-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .dish-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .dish-card.good {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-color: #28a745;
+        }
+
+        .dish-card.bad {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-color: #dc3545;
+        }
+
+        .dish-card.neutral {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-color: #ffc107;
+        }
+
+        .dish-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .meal-indicators {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .meal-tag {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .meal-tag.lunch {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #ffcc02;
+        }
+
+        .meal-tag.dinner {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+
+        .dish-description {
+            color: #6c757d;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .rating-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .rating-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-left: auto;
+        }
+
+        .rating-btn {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .rating-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .rating-btn:active {
+            transform: scale(0.95);
+        }
+
+        .rating-btn.good {
+            background: #28a745;
+            color: white;
+        }
+
+        .rating-btn.good:hover {
+            background: #218838;
+        }
+
+        .rating-btn.bad {
+            background: #dc3545;
+            color: white;
+        }
+
+        .rating-btn.bad:hover {
+            background: #c82333;
+        }
+
+        .rating-btn.voted {
+            opacity: 0.9;
+            cursor: pointer;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
+        }
+
+        .rating-btn.voted:hover {
+            opacity: 1;
+        }
+
+        .rating-stats {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-align: right;
+        }
+
+        .legend {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .legend-color.good {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+
+        .legend-color.bad {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        }
+
+        .legend-color.neutral {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .sort-dropdown {
+                align-self: flex-end;
+            }
+            
+            .rating-section {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
+            
+            .dish-name {
+                flex: 1;
+                min-width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .rating-buttons {
+                justify-self: center;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍽️ BuffetRating</h1>
+        <p>Rate dishes to help fellow diners discover the best!</p>
+        <div class="auth-section" id="authSection">
+            <div class="login-form" id="loginForm">
+                <input type="email" id="emailInput" placeholder="Enter your email to rate dishes" />
+                <button onclick="login()" class="login-btn">Login</button>
+            </div>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <span id="userEmail"></span>
+                <button onclick="logout()" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="read-only-notice" id="readOnlyNotice">
+            Please log in with your email address to rate dishes and see sorting options.
+        </div>
+
+        <div class="legend" id="legend" style="display: none;">
+            <div class="legend-item">
+                <div class="legend-color good"></div>
+                <span>More Good Ratings</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color neutral"></div>
+                <span>Mixed/No Ratings</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color bad"></div>
+                <span>More Bad Ratings</span>
+            </div>
+        </div>
+
+        <div class="controls" id="controls" style="display: none;">
+            <div class="category-tabs">
+                <div class="tab active" data-category="all">All Dishes</div>
+                <div class="tab" data-category="appetizers">Appetizers</div>
+                <div class="tab" data-category="mains">Main Dishes</div>
+                <div class="tab" data-category="seafood">Seafood</div>
+                <div class="tab" data-category="desserts">Desserts</div>
+            </div>
+            
+            <div class="sort-dropdown">
+                <div class="sort-button" onclick="toggleSortOptions()">
+                    <span id="currentSort">Default Order</span>
+                    <span>▼</span>
+                </div>
+                <div class="sort-options" id="sortOptions">
+                    <div class="sort-option active" onclick="changeSortOption('default')">Default Order</div>
+                    <div class="sort-option" onclick="changeSortOption('rating')">Best Rated First</div>
+                    <div class="sort-option" onclick="changeSortOption('popularity')">Most Popular First</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-grid" id="menuGrid">
+            <!-- Dishes will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Fixed Amplify library imports using working CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/aws-amplify@6.15.5/dist/cjs/index.min.js"></script>
+    
+    <script>
+        // Fixed Amplify configuration with correct API endpoint
+        const awsconfig = {
+            "aws_project_region": "us-east-1",
+            "aws_cognito_region": "us-east-1",
+            "aws_user_pools_id": "us-east-1_XXXXXXXXX",
+            "aws_user_pools_web_client_id": "XXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "oauth": {},
+            "aws_cognito_username_attributes": ["EMAIL"],
+            "aws_cognito_social_providers": [],
+            "aws_cognito_signup_attributes": ["EMAIL"],
+            "aws_cognito_mfa_configuration": "OFF",
+            "aws_cognito_mfa_types": ["SMS"],
+            "aws_cognito_password_protection_settings": {
+                "passwordPolicyMinLength": 8,
+                "passwordPolicyCharacters": []
+            },
+            "aws_cognito_verification_mechanisms": ["EMAIL"],
+            "aws_cloud_logic_custom": [
+                {
+                    "name": "buffetratingapi",
+                    "endpoint": "https://bx3pjl032k.execute-api.us-east-1.amazonaws.com/dev",
+                    "region": "us-east-1"
+                }
+            ]
+        };
+        
+        // Configure Amplify with error handling
+        try {
+            if (typeof Amplify !== 'undefined') {
+                Amplify.configure(awsconfig);
+            }
+        } catch (error) {
+            console.error('Amplify configuration error:', error);
+        }
+
+        // Sample menu data with initial ratings and meal availability
+        const menuData = {
+            appetizers: [
+                { id: 1, name: "Spring Rolls", description: "Crispy vegetable spring rolls served with sweet & sour sauce", good: 89, bad: 12, meals: ['lunch', 'afternoon', 'dinner'] },
+                { id: 2, name: "Pot Stickers", description: "Pan-fried pork dumplings with ginger soy dipping sauce", good: 156, bad: 23, meals: ['lunch', 'afternoon', 'dinner'] },
+                { id: 3, name: "Crab Rangoon", description: "Crispy wonton filled with cream cheese and crab", good: 45, bad: 67, meals: ['dinner'] }
+            ],
+            mains: [
+                { id: 4, name: "General Tso's Chicken", description: "Sweet and spicy chicken with steamed broccoli", good: 234, bad: 45, meals: ['lunch', 'afternoon', 'dinner'] },
+                { id: 5, name: "Beef Lo Mein", description: "Soft noodles with tender beef and mixed vegetables", good: 67, bad: 89, meals: ['lunch', 'afternoon', 'dinner'] },
+                { id: 6, name: "Mapo Tofu", description: "Silky tofu in spicy Sichuan sauce with ground pork", good: 123, bad: 34, meals: ['dinner'] },
+                { id: 7, name: "Orange Chicken", description: "Battered chicken in tangy orange glaze", good: 12, bad: 145, meals: ['lunch'] }
+            ],
+            seafood: [
+                { id: 8, name: "Honey Walnut Shrimp", description: "Crispy shrimp with candied walnuts and mayo sauce", good: 178, bad: 22, meals: ['dinner'] },
+                { id: 9, name: "Salt & Pepper Fish", description: "Lightly battered fish with jalapeños and onions", good: 89, bad: 91, meals: ['lunch', 'afternoon', 'dinner'] },
+                { id: 10, name: "Szechuan Scallops", description: "Pan-seared scallops in spicy garlic sauce", good: 67, bad: 23, meals: ['dinner'] }
+            ],
+            desserts: [
+                { id: 11, name: "Fried Ice Cream", description: "Vanilla ice cream in crispy coating with honey drizzle", good: 134, bad: 28, meals: ['lunch', 'afternoon', 'dinner'] },
+                { id: 12, name: "Sesame Balls", description: "Deep-fried glutinous rice balls with red bean paste", good: 45, bad: 12, meals: ['lunch', 'afternoon', 'dinner'] },
+                { id: 13, name: "Mango Pudding", description: "Silky smooth mango pudding with fresh fruit", good: 23, bad: 67, meals: ['afternoon'] }
+            ]
+        };
+
+        let userVotes = {}; // Track user votes
+        let currentCategory = 'all';
+        let currentSort = 'default';
+        let isLoggedIn = false;
+        let userEmail = '';
+
+        // Enhanced authentication check with better session handling
+        async function checkExistingLogin() {
+            try {
+                // Check localStorage for persistent session
+                const storedUser = localStorage.getItem('buffetRatingUser');
+                if (storedUser) {
+                    const userData = JSON.parse(storedUser);
+                    userEmail = userData.email;
+                    isLoggedIn = true;
+                    updateUIForLoggedInUser();
+                    await loadDishesFromAPI();
+                    return;
+                }
+
+                // Check Amplify authentication if available
+                if (typeof Amplify !== 'undefined' && Amplify.Auth) {
+                    const user = await Amplify.Auth.currentAuthenticatedUser();
+                    userEmail = user.attributes.email;
+                    isLoggedIn = true;
+                    // Store for persistence
+                    localStorage.setItem('buffetRatingUser', JSON.stringify({email: userEmail}));
+                    updateUIForLoggedInUser();
+                    await loadDishesFromAPI();
+                }
+            } catch (error) {
+                console.log('No authenticated user');
+                // Clear any stale localStorage data
+                localStorage.removeItem('buffetRatingUser');
+            }
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        async function login() {
+            const email = document.getElementById('emailInput').value.trim();
+            
+            if (!email) {
+                alert('Please enter your email address.');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+
+            // Add loading state to login button
+            const loginBtn = document.querySelector('.login-btn');
+            const originalText = loginBtn.textContent;
+            loginBtn.innerHTML = '<div class="loading"></div>';
+            loginBtn.disabled = true;
+            
+            try {
+                userEmail = email;
+                isLoggedIn = true;
+                
+                // Store session persistently
+                localStorage.setItem('buffetRatingUser', JSON.stringify({email: userEmail}));
+                
+                updateUIForLoggedInUser();
+                await loadDishesFromAPI();
+                
+                console.log('Login successful for:', email);
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed. Please try again.');
+                
+                // Reset login button
+                loginBtn.textContent = originalText;
+                loginBtn.disabled = false;
+            }
+        }
+
+        async function logout() {
+            try {
+                if (typeof Amplify !== 'undefined' && Amplify.Auth) {
+                    await Amplify.Auth.signOut();
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            // Clear persistent storage
+            localStorage.removeItem('buffetRatingUser');
+            
+            isLoggedIn = false;
+            userEmail = '';
+            userVotes = {}; // Clear user votes
+            updateUIForLoggedOutUser();
+        }
+
+        function updateUIForLoggedInUser() {
+            // Show user info, hide login form
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('userEmail').textContent = userEmail;
+            
+            // Show controls and legend, hide read-only notice
+            document.getElementById('controls').style.display = 'flex';
+            document.getElementById('legend').style.display = 'flex';
+            document.getElementById('readOnlyNotice').style.display = 'none';
+            
+            // Re-render menu with rating buttons
+            renderMenu();
+        }
+
+        function updateUIForLoggedOutUser() {
+            // Show login form, hide user info
+            document.getElementById('loginForm').style.display = 'flex';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('emailInput').value = '';
+            
+            // Reset login button state
+            const loginBtn = document.querySelector('.login-btn');
+            loginBtn.textContent = 'Login';
+            loginBtn.disabled = false;
+            
+            // Hide controls and legend, show read-only notice
+            document.getElementById('controls').style.display = 'none';
+            document.getElementById('legend').style.display = 'none';
+            document.getElementById('readOnlyNotice').style.display = 'block';
+            
+            // Re-render menu without rating buttons
+            renderMenu();
+        }
+
+        function sortDishes(dishes, sortType) {
+            const sortedDishes = [...dishes];
+            
+            switch(sortType) {
+                case 'rating':
+                    return sortedDishes.sort((a, b) => {
+                        const aRatio = a.good + a.bad > 0 ? a.good / (a.good + a.bad) : 0;
+                        const bRatio = b.good + b.bad > 0 ? b.good / (b.good + b.bad) : 0;
+                        return bRatio - aRatio; // Higher ratio first
+                    });
+                case 'popularity':
+                    return sortedDishes.sort((a, b) => {
+                        const aTotalVotes = a.good + a.bad;
+                        const bTotalVotes = b.good + b.bad;
+                        return bTotalVotes - aTotalVotes; // More votes first
+                    });
+                default:
+                    return sortedDishes; // Keep original order
+            }
+        }
+
+        function getDishClass(good, bad) {
+            if (good + bad < 10) return 'neutral'; // Not enough data
+            const ratio = good / (good + bad);
+            if (ratio >= 0.65) return 'good';
+            if (ratio <= 0.35) return 'bad';
+            return 'neutral';
+        }
+
+        function getMealIcons(meals) {
+            // If dish is available all day (includes afternoon), show no tags
+            if (meals.includes('afternoon') && meals.includes('lunch') && meals.includes('dinner')) {
+                return '';
+            }
+            
+            const icons = {
+                lunch: '🍽️',
+                dinner: '🌙'
+            };
+            
+            // Only show lunch and dinner tags for limited availability dishes
+            const visibleMeals = meals.filter(meal => meal !== 'afternoon');
+            
+            return visibleMeals.map(meal => 
+                `<span class="meal-tag ${meal}">${icons[meal]} ${meal.charAt(0).toUpperCase() + meal.slice(1)}</span>`
+            ).join('');
+        }
+
+        function createDishCard(dish, category) {
+            const dishClass = getDishClass(dish.good, dish.bad);
+            const hasVoted = userVotes[dish.id];
+            
+            const ratingButtons = isLoggedIn ? `
+                <div class="rating-buttons">
+                    <button class="rating-btn bad ${hasVoted === 'bad' ? 'voted' : ''}" 
+                            onclick="rateDish(${dish.id}, 'bad')"
+                            title="${hasVoted === 'bad' ? 'You rated this Bad - Click to change' : 'Rate as Bad'}">
+                        👎 Bad
+                    </button>
+                    <button class="rating-btn good ${hasVoted === 'good' ? 'voted' : ''}" 
+                            onclick="rateDish(${dish.id}, 'good')"
+                            title="${hasVoted === 'good' ? 'You rated this Good - Click to change' : 'Rate as Good'}">
+                        👍 Good
+                    </button>
+                </div>
+            ` : '';
+            
+            const ratingStats = isLoggedIn ? `
+                <div class="rating-stats">
+                    👍 ${dish.good} | 👎 ${dish.bad}
+                </div>
+            ` : '';
+            
+            return `
+                <div class="dish-card ${dishClass}" data-category="${category}">
+                    <div class="rating-section">
+                        <div class="dish-name">
+                            <span>${dish.name}</span>
+                            <div class="meal-indicators">
+                                ${getMealIcons(dish.meals)}
+                            </div>
+                        </div>
+                        ${ratingStats}
+                        ${ratingButtons}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMenu() {
+            const menuGrid = document.getElementById('menuGrid');
+            let html = '';
+            let allDishes = [];
+            
+            // Collect dishes based on current category
+            Object.entries(menuData).forEach(([category, dishes]) => {
+                if (currentCategory === 'all' || currentCategory === category) {
+                    dishes.forEach(dish => {
+                        allDishes.push({...dish, category});
+                    });
+                }
+            });
+            
+            // Sort dishes based on current sort option
+            const sortedDishes = sortDishes(allDishes, currentSort);
+            
+            // Generate HTML for sorted dishes
+            sortedDishes.forEach(dish => {
+                html += createDishCard(dish, dish.category);
+            });
+            
+            menuGrid.innerHTML = html;
+        }
+
+        // Enhanced API Integration with better error handling
+        async function loadDishesFromAPI() {
+            if (!isLoggedIn) return;
+            
+            try {
+                if (typeof Amplify !== 'undefined' && Amplify.API) {
+                    console.log('Loading dishes from API...');
+                    
+                    const response = await Amplify.API.get('buffetratingapi', '/dishes');
+                    console.log('API Response:', response);
+                    
+                    // If we have dishes from the API, use them
+                    if (response && response.length > 0) {
+                        const categorizedData = {};
+                        response.forEach(dish => {
+                            if (!categorizedData[dish.category]) {
+                                categorizedData[dish.category] = [];
+                            }
+                            categorizedData[dish.category].push(dish);
+                            
+                            // Update user votes
+                            if (dish.userVotes && dish.userVotes[userEmail]) {
+                                userVotes[dish.id] = dish.userVotes[userEmail];
+                            }
+                        });
+                        
+                        // Update menuData with API response
+                        Object.assign(menuData, categorizedData);
+                        renderMenu();
+                        return;
+                    }
+                    
+                    // If no dishes in API, initialize with sample data
+                    console.log('No dishes found in API, initializing sample data...');
+                    await initializeSampleData();
+                } else {
+                    console.log('Amplify not available, using sample data');
+                    renderMenu();
+                }
+            } catch (error) {
+                console.error('Error loading dishes from API:', error);
+                console.log('Falling back to sample data');
+                renderMenu();
+            }
+        }
+
+        async function initializeSampleData() {
+            const allDishes = [];
+            
+            // Flatten menuData and add category info
+            Object.entries(menuData).forEach(([category, dishes]) => {
+                dishes.forEach(dish => {
+                    allDishes.push({...dish, category});
+                });
+            });
+            
+            // Send each dish to API
+            for (const dish of allDishes) {
+                try {
+                    await Amplify.API.post('buffetratingapi', '/dishes', {
+                        body: dish
+                    });
+                    console.log('Created dish:', dish.name);
+                } catch (error) {
+                    console.error('Error creating dish:', dish.name, error);
+                }
+            }
+            
+            // Reload from API
+            console.log('Sample data initialized, reloading from API...');
+            await loadDishesFromAPI();
+        }
+
+        async function rateDish(dishId, rating) {
+            if (!isLoggedIn) {
+                alert('Please log in to rate dishes.');
+                return;
+            }
+            
+            // Add loading state
+            const buttons = document.querySelectorAll(`[onclick*="${dishId}"]`);
+            buttons.forEach(btn => {
+                btn.innerHTML = '<div class="loading"></div>';
+                btn.disabled = true;
+            });
+            
+            try {
+                if (typeof Amplify !== 'undefined' && Amplify.API) {
+                    console.log(`Voting ${rating} for dish ${dishId} by user ${userEmail}`);
+                    
+                    // Send vote to API
+                    const response = await Amplify.API.post('buffetratingapi', '/dishes/vote', {
+                        body: {
+                            dishId: dishId.toString(),
+                            vote: rating,
+                            userEmail: userEmail
+                        }
+                    });
+                    
+                    console.log('Vote response:', response);
+                    
+                    // Reload dishes to get updated counts
+                    await loadDishesFromAPI();
+                } else {
+                    // Fallback to local logic for demo
+                    console.log('Using fallback local voting logic');
+                    setTimeout(() => {
+                        // Find and update the dish
+                        let dish = null;
+                        for (const category in menuData) {
+                            dish = menuData[category].find(d => d.id === dishId);
+                            if (dish) break;
+                        }
+                        
+                        if (!dish) return;
+                        
+                        const previousVote = userVotes[dishId];
+                        
+                        // If user previously voted, remove that vote first
+                        if (previousVote) {
+                            if (previousVote === 'good') {
+                                dish.good = Math.max(0, dish.good - 1);
+                            } else {
+                                dish.bad = Math.max(0, dish.bad - 1);
+                            }
+                        }
+                        
+                        // If clicking the same rating, remove the vote (toggle off)
+                        if (previousVote === rating) {
+                            delete userVotes[dishId];
+                        } else {
+                            // Add new vote
+                            if (rating === 'good') {
+                                dish.good++;
+                            } else {
+                                dish.bad++;
+                            }
+                            // Record user vote
+                            userVotes[dishId] = rating;
+                        }
+                        
+                        // Re-render menu
+                        renderMenu();
+                    }, 300);
+                }
+            } catch (error) {
+                console.error('Error voting:', error);
+                alert('Failed to submit vote. Please try again.');
+                renderMenu(); // Reset buttons
+            }
+        }
+
+        // Add email input enter key support
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, checking for existing login...');
+            checkExistingLogin();
+            
+            const emailInput = document.getElementById('emailInput');
+            if (emailInput) {
+                emailInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        login();
+                    }
+                });
+            }
+        });
+
+        function switchCategory(category) {
+            currentCategory = category;
+            
+            // Update active tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            
+            // Re-render menu
+            renderMenu();
+        }
+
+        function toggleSortOptions() {
+            const sortOptions = document.getElementById('sortOptions');
+            sortOptions.classList.toggle('show');
+        }
+
+        function changeSortOption(sortType) {
+            currentSort = sortType;
+            
+            // Update button text
+            const sortNames = {
+                'default': 'Default Order',
+                'rating': 'Best Rated First', 
+                'popularity': 'Most Popular First'
+            };
+            document.getElementById('currentSort').textContent = sortNames[sortType];
+            
+            // Update active option
+            document.querySelectorAll('.sort-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Hide dropdown
+            document.getElementById('sortOptions').classList.remove('show');
+            
+            // Re-render menu with new sort
+            renderMenu();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const sortDropdown = document.querySelector('.sort-dropdown');
+            if (!sortDropdown.contains(event.target)) {
+                document.getElementById('sortOptions').classList.remove('show');
+            }
+        });
+
+        // Event listeners for category tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchCategory(tab.dataset.category);
+            });
+        });
+
+        // Initial render
+        renderMenu();
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "resourceName": "Dishes",
+  "tableName": "Dishes",
+  "partitionKey": {
+    "fieldName": "id",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

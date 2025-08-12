@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "paths": {
+    "/dishes": {
+      "name": "/dishes",
+      "lambdaFunction": "buffetratingfunction",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/dishes/vote": {
+      "name": "/dishes/vote",
+      "lambdaFunction": "buffetratingfunction",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

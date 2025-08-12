@@ -1,0 +1,17 @@
+{
+  "name": "buffetrating",
+  "version": "1.0.0",
+  "description": "BuffetRating - Universal Buffet Menu Rating System",
+  "main": "src/index.html",
+  "scripts": {
+    "build": "if not exist dist mkdir dist && if exist src\\* copy src\\* dist\\",
+    "serve": "npx http-server dist -p 8080 -o",
+    "dev": "npm run build && npm run serve"
+  },
+  "dependencies": {
+    "aws-amplify": "^6.0.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
